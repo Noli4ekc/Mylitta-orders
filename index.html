@@ -5,6 +5,7 @@
 <title>Mylitta — Учёт заказов</title>
 
 <style>
+/* ——— ТВОИ СТИЛИ ——— */
 :root {
 --brand: #ff6fb1;
 --brand-dark: #e85fa0;
@@ -17,9 +18,7 @@
 --shadow: 0 4px 14px rgba(255, 111, 177, 0.15);
 }
 
-* {
-box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
 margin: 0;
@@ -29,7 +28,6 @@ font-family: "Segoe UI", sans-serif;
 color: var(--text);
 }
 
-/* Центрируем заголовок */
 .header {
 background: var(--brand);
 padding: 22px 24px;
@@ -37,13 +35,11 @@ color: white;
 font-size: 32px;
 font-weight: 700;
 letter-spacing: 0.5px;
-box-shadow: 0 4px 12px rgba(255, 111, 177, 0.4);
 text-align: center;
+box-shadow: 0 4px 12px rgba(255, 111, 177, 0.4);
 }
 
-.container {
-margin: 20px;
-}
+.container { margin: 20px; }
 
 .toolbar {
 background: var(--card);
@@ -86,9 +82,7 @@ box-shadow: var(--shadow);
 white-space: nowrap;
 }
 
-button:hover {
-background: var(--brand-dark);
-}
+button:hover { background: var(--brand-dark); }
 
 .table-wrapper {
 background: var(--card);
@@ -121,13 +115,9 @@ text-align: center;
 vertical-align: middle;
 }
 
-tr:nth-child(even) {
-background: #fffafd;
-}
+tr:nth-child(even) { background: #fffafd; }
 
-.paid-row {
-background: var(--success) !important;
-}
+.paid-row { background: var(--success) !important; }
 
 textarea.cell-items {
 min-height: 40px;
@@ -140,9 +130,9 @@ input.cell-sum {
 width: 80px;
 text-align: right;
 }
-
 </style>
 </head>
+
 <body>
 
 <div class="header">Mylitta — Учёт заказов</div>
@@ -190,10 +180,10 @@ text-align: right;
 
 </div>
 
+<!-- ——— ТВОЙ ОСНОВНОЙ JS ——— -->
 <script>
 let counter = 1;
 
-/* Сохранение */
 function saveData() {
 const rows = [];
 document.querySelectorAll("#tableBody tr").forEach(row => {
@@ -205,16 +195,13 @@ rows.push(rowData);
 localStorage.setItem("ordersData", JSON.stringify(rows));
 }
 
-/* Загрузка */
 function loadData() {
 const saved = localStorage.getItem("ordersData");
 if (!saved) return;
-
 const rows = JSON.parse(saved);
 rows.forEach(data => addRow(data));
 }
 
-/* Добавление строки */
 function addRow(savedData = null) {
 const table = document.getElementById("tableBody");
 const row = document.createElement("tr");
@@ -257,23 +244,19 @@ table.appendChild(row);
 const itemsField = row.querySelector(".cell-items");
 const sumField = row.querySelector(".cell-sum");
 
-/* Автосумма: цена через пробел */
 itemsField.addEventListener("input", () => {
 const lines = itemsField.value.split("\n");
 let total = 0;
-
 lines.forEach(line => {
 const parts = line.trim().split(" ");
 const last = parts[parts.length - 1];
 const price = parseFloat(last);
 if (!isNaN(price)) total += price;
 });
-
 sumField.value = total;
 saveData();
 });
 
-/* Восстановление данных */
 if (savedData) {
 const inputs = row.querySelectorAll("input, textarea, select");
 savedData.forEach((value, i) => inputs[i].value = value);
@@ -288,14 +271,12 @@ counter++;
 saveData();
 }
 
-/* Подсветка */
 function updateRowAppearance(select) {
 const row = select.closest("tr");
 if (select.value === "yes") row.classList.add("paid-row");
 else row.classList.remove("paid-row");
 }
 
-/* Сброс покупок */
 function resetPurchases(btn) {
 const row = btn.closest("tr");
 row.querySelector(".cell-items").value = "";
@@ -303,7 +284,6 @@ row.querySelector(".cell-sum").value = 0;
 saveData();
 }
 
-/* Полный сброс */
 function resetFullRow(btn) {
 const row = btn.closest("tr");
 row.querySelectorAll("input, textarea").forEach(el => el.value = "");
@@ -314,7 +294,6 @@ saveData();
 applyFilters();
 }
 
-/* Фильтры */
 function applyFilters() {
 const searchValue = document.getElementById("searchInput").value.toLowerCase();
 const paymentFilter = document.getElementById("filterPayment").value;
@@ -338,6 +317,24 @@ row.style.display = visible ? "" : "none";
 }
 
 loadData();
+</script>
+
+<!-- ——— ПОДКЛЮЧЕНИЕ FIREBASE ——— -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyAq7NnxP_58TGTdDyyZ3eTcWfECoyGvxC0",
+authDomain: "mylitta-orders.firebaseapp.com",
+projectId: "mylitta-orders",
+storageBucket: "mylitta-orders.firebasestorage.app",
+messagingSenderId: "882881706964",
+appId: "1:882881706964:web:65b58522679ad561d17441"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 </script>
 
 </body>
