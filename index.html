@@ -5,7 +5,6 @@
 <title>Mylitta — Учёт заказов</title>
 
 <style>
-/* ——— ТВОИ СТИЛИ ——— */
 :root {
 --brand: #ff6fb1;
 --brand-dark: #e85fa0;
@@ -119,11 +118,13 @@ tr:nth-child(even) { background: #fffafd; }
 
 .paid-row { background: var(--success) !important; }
 
+/* Исправленное поле "Покупки" */
 textarea.cell-items {
 min-height: 40px;
-max-height: 120px;
+max-height: none;
 resize: vertical;
 width: 100%;
+overflow-y: auto;
 }
 
 input.cell-sum {
@@ -180,11 +181,14 @@ text-align: right;
 
 </div>
 
-<!-- ——— ТВОЙ ОСНОВНОЙ JS ——— -->
 <script>
 let counter = 1;
+let isUpdatingFromFirebase = false;
 
-function saveData() {
+/* Сохранение в Firebase */
+function saveDataToFirebase() {
+if (isUpdatingFromFirebase) return;
+
 const rows = [];
 document.querySelectorAll("#tableBody tr").forEach(row => {
 const cells = row.querySelectorAll("input, textarea, select");
@@ -192,16 +196,24 @@ const rowData = [];
 cells.forEach(c => rowData.push(c.value));
 rows.push(rowData);
 });
-localStorage.setItem("ordersData", JSON.stringify(rows));
+
+set(ref(db, "orders"), rows);
 }
 
-function loadData() {
-const saved = localStorage.getItem("ordersData");
-if (!saved) return;
-const rows = JSON.parse(saved);
+/* Загрузка из Firebase */
+function loadDataFromFirebase(rows) {
+isUpdatingFromFirebase = true;
+
+const table = document.getElementById("tableBody");
+table.innerHTML = "";
+counter = 1;
+
 rows.forEach(data => addRow(data));
+
+isUpdatingFromFirebase = false;
 }
 
+/* Добавление строки */
 function addRow(savedData = null) {
 const table = document.getElementById("tableBody");
 const row = document.createElement("tr");
@@ -215,21 +227,21 @@ row.innerHTML = `
 <td><input type="number" class="cell-sum" readonly></td>
 
 <td>
-<select class="cell-payment" onchange="updateRowAppearance(this); saveData(); applyFilters();">
+<select class="cell-payment" onchange="updateRowAppearance(this); saveDataToFirebase(); applyFilters();">
 <option value="no">Не оплачено</option>
 <option value="yes">Оплачено</option>
 </select>
 </td>
 
 <td>
-<select onchange="saveData()">
+<select onchange="saveDataToFirebase()">
 <option>Белпочта</option>
 <option>ЕвроПочта</option>
 </select>
 </td>
 
 <td>
-<select class="cell-sent" onchange="saveData(); applyFilters()">
+<select class="cell-sent" onchange="saveDataToFirebase(); applyFilters()">
 <option value="no">Не отправлено</option>
 <option value="yes">Отправлено</option>
 </select>
@@ -247,14 +259,16 @@ const sumField = row.querySelector(".cell-sum");
 itemsField.addEventListener("input", () => {
 const lines = itemsField.value.split("\n");
 let total = 0;
+
 lines.forEach(line => {
 const parts = line.trim().split(" ");
 const last = parts[parts.length - 1];
 const price = parseFloat(last);
 if (!isNaN(price)) total += price;
 });
+
 sumField.value = total;
-saveData();
+saveDataToFirebase();
 });
 
 if (savedData) {
@@ -264,36 +278,40 @@ updateRowAppearance(row.querySelector(".cell-payment"));
 }
 
 row.querySelectorAll("input, textarea").forEach(el => {
-el.addEventListener("input", saveData);
+el.addEventListener("input", saveDataToFirebase);
 });
 
 counter++;
-saveData();
+saveDataToFirebase();
 }
 
+/* Подсветка */
 function updateRowAppearance(select) {
 const row = select.closest("tr");
 if (select.value === "yes") row.classList.add("paid-row");
 else row.classList.remove("paid-row");
 }
 
+/* Сброс покупок */
 function resetPurchases(btn) {
 const row = btn.closest("tr");
 row.querySelector(".cell-items").value = "";
 row.querySelector(".cell-sum").value = 0;
-saveData();
+saveDataToFirebase();
 }
 
+/* Полный сброс */
 function resetFullRow(btn) {
 const row = btn.closest("tr");
 row.querySelectorAll("input, textarea").forEach(el => el.value = "");
 row.querySelector(".cell-payment").value = "no";
 row.querySelector(".cell-sent").value = "no";
 row.classList.remove("paid-row");
-saveData();
+saveDataToFirebase();
 applyFilters();
 }
 
+/* Фильтры */
 function applyFilters() {
 const searchValue = document.getElementById("searchInput").value.toLowerCase();
 const paymentFilter = document.getElementById("filterPayment").value;
@@ -315,11 +333,8 @@ if (sentFilter === "not_sent" && sent !== "no") visible = false;
 row.style.display = visible ? "" : "none";
 });
 }
-
-loadData();
 </script>
 
-<!-- ——— ПОДКЛЮЧЕНИЕ FIREBASE ——— -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
@@ -335,6 +350,11 @@ appId: "1:882881706964:web:65b58522679ad561d17441"
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+
+onValue(ref(db, "orders"), snapshot => {
+const rows = snapshot.val();
+if (rows) loadDataFromFirebase(rows);
+});
 </script>
 
 </body>
