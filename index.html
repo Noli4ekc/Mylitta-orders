@@ -58,21 +58,32 @@ font-size: 14px;
 textarea.cell-items {
 min-height: 40px;
 width: 100%;
-resize: vertical; /* только вниз — не ломает таблицу */
+resize: vertical;
 overflow: auto;
-display: block; /* чтобы ширина не влияла на таблицу */
+display: block;
 }
 
+/* Фикс ширины колонки "Сумма" */
+td:nth-child(6), th:nth-child(6) {
+width: 80px;
+max-width: 80px;
+min-width: 80px;
+white-space: nowrap;
+}
+
+/* Горизонтальный скролл таблицы */
 .table-wrapper {
 background: var(--card);
 border-radius: 12px;
 box-shadow: var(--shadow);
 border: 1px solid var(--border);
-overflow: auto;
+overflow-x: auto;
+overflow-y: hidden;
 }
 
 table {
 width: 100%;
+min-width: 900px; /* чтобы таблица не сжималась */
 border-collapse: collapse;
 }
 
