@@ -54,13 +54,13 @@ border: 1px solid var(--border);
 font-size: 14px;
 }
 
-/* Поле "Товары" — растягивается и вниз, и вправо */
+/* Поле "Товары" — независимое, растягивается только вниз */
 textarea.cell-items {
 min-height: 40px;
-min-width: 120px;
-resize: both;
 width: 100%;
+resize: vertical; /* только вниз — не ломает таблицу */
 overflow: auto;
+display: block; /* чтобы ширина не влияла на таблицу */
 }
 
 .table-wrapper {
@@ -157,11 +157,11 @@ const db = getDatabase(app);
 let counter = 1;
 let isUpdatingFromFirebase = false;
 
-/* ДЕБАУНС — чтобы ввод не сбрасывал курсор */
+/* ДЕБАУНС — чтобы ввод и удаление не лагали */
 let saveTimeout = null;
 function saveDataDebounced() {
 clearTimeout(saveTimeout);
-saveTimeout = setTimeout(saveDataToFirebase, 300);
+saveTimeout = setTimeout(saveDataToFirebase, 250);
 }
 
 /* Глобальные функции */
