@@ -40,7 +40,7 @@ text-align: center;
 
 .container { 
 margin: 20px;
-overflow-x: auto; /* Добавлено для мобильных */
+overflow-x: auto;
 }
 
 .toolbar {
@@ -55,32 +55,67 @@ gap: 10px;
 margin-bottom: 18px;
 }
 
-/* ФИКС: Улучшение интерактивности полей ввода */
+/* Стили для полей ввода */
 input, select, textarea {
-padding: 8px 10px;
+padding: 10px 12px;
 border-radius: 8px;
 border: 1px solid var(--border);
-font-size: 14px;
+font-size: 15px;
 font-family: "Segoe UI", sans-serif;
 background: white;
-transition: border 0.2s, box-shadow 0.2s;
-width: 100%; /* Важно для ячеек таблицы */
+transition: all 0.3s;
+width: 100%;
 }
 
 input:focus, select:focus, textarea:focus {
 outline: none;
 border-color: var(--brand);
-box-shadow: 0 0 0 2px rgba(255, 111, 177, 0.2);
+box-shadow: 0 0 0 3px rgba(255, 111, 177, 0.3);
+background-color: #fff9fc;
 }
 
 /* Особые стили для textarea "Товары" */
 textarea.cell-items {
-min-height: 40px;
-height: 40px; /* Начальная высота */
+min-height: 45px;
+height: 45px;
 resize: vertical;
 overflow-y: auto;
 display: block;
-line-height: 1.4;
+line-height: 1.5;
+padding: 8px 10px;
+font-size: 14px;
+}
+
+/* Индикатор несохраненных изменений */
+input.changed, textarea.changed, select.changed {
+background-color: #fff9e6 !important;
+border-color: #ffcc00 !important;
+}
+
+/* Сообщение о сохранении */
+.save-notification {
+position: fixed;
+top: 20px;
+right: 20px;
+background: #4CAF50;
+color: white;
+padding: 12px 20px;
+border-radius: 8px;
+box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+z-index: 1000;
+opacity: 0;
+transform: translateY(-10px);
+transition: opacity 0.3s, transform 0.3s;
+pointer-events: none;
+}
+
+.save-notification.show {
+opacity: 1;
+transform: translateY(0);
+}
+
+.save-notification.saving {
+background: #2196F3;
 }
 
 /* ФИКС: Оптимизация ширины колонок */
@@ -96,35 +131,35 @@ margin-top: 10px;
 
 table {
 width: 100%;
-min-width: 1200px; /* Увеличил минимальную ширину */
+min-width: 1250px;
 border-collapse: collapse;
-table-layout: fixed; /* Важно для фиксированных колонок */
+table-layout: fixed;
 }
 
 /* Фиксированные ширины для колонок */
 th, td {
-padding: 6px 4px; /* Уменьшил горизонтальные отступы */
-vertical-align: top;
+padding: 8px 6px;
+vertical-align: middle;
 border-bottom: 1px solid var(--border);
 word-wrap: break-word;
 }
 
 /* Ширины колонок */
-th:nth-child(1), td:nth-child(1) { width: 40px; } /* № */
-th:nth-child(2), td:nth-child(2) { width: 120px; } /* Имя */
-th:nth-child(3), td:nth-child(3) { width: 120px; } /* Телефон */
-th:nth-child(4), td:nth-child(4) { width: 150px; } /* Адрес */
-th:nth-child(5), td:nth-child(5) { width: 250px; } /* Товары */
-th:nth-child(6), td:nth-child(6) { width: 80px; } /* Сумма */
-th:nth-child(7), td:nth-child(7) { width: 100px; } /* Оплата */
-th:nth-child(8), td:nth-child(8) { width: 100px; } /* Сервис */
-th:nth-child(9), td:nth-child(9) { width: 100px; } /* Отправка */
-th:nth-child(10), td:nth-child(10) { width: 80px; } /* Сброс */
-th:nth-child(11), td:nth-child(11) { width: 100px; } /* Полный сброс */
+th:nth-child(1), td:nth-child(1) { width: 50px; } /* № */
+th:nth-child(2), td:nth-child(2) { width: 140px; } /* Имя */
+th:nth-child(3), td:nth-child(3) { width: 140px; } /* Телефон */
+th:nth-child(4), td:nth-child(4) { width: 180px; } /* Адрес */
+th:nth-child(5), td:nth-child(5) { width: 280px; min-width: 280px; } /* Товары */
+th:nth-child(6), td:nth-child(6) { width: 90px; } /* Сумма */
+th:nth-child(7), td:nth-child(7) { width: 110px; } /* Оплата */
+th:nth-child(8), td:nth-child(8) { width: 120px; } /* Сервис */
+th:nth-child(9), td:nth-child(9) { width: 120px; } /* Отправка */
+th:nth-child(10), td:nth-child(10) { width: 100px; } /* Сброс */
+th:nth-child(11), td:nth-child(11) { width: 120px; } /* Полный сброс */
 
 th {
 background: #ffe3f2;
-padding: 8px 4px;
+padding: 12px 6px;
 font-weight: 600;
 border-bottom: 2px solid var(--border);
 text-align: center;
@@ -143,13 +178,14 @@ td > textarea,
 td > select {
 margin: 0 auto;
 display: block;
-text-align: center;
 }
 
-/* Особый стиль для textarea - выравнивание по левому краю */
+/* Особый стиль для textarea */
 textarea.cell-items {
 text-align: left;
-padding: 6px;
+resize: vertical;
+min-height: 60px;
+height: 60px;
 }
 
 /* Особый стиль для поля "Сумма" */
@@ -158,19 +194,21 @@ font-weight: bold;
 color: #e85fa0;
 background: #fff0f7;
 text-align: center;
+font-size: 16px;
 }
 
 /* Кнопки в ячейках */
 td button {
-padding: 6px 10px;
+padding: 8px 12px;
 background: var(--brand);
 color: white;
 border: none;
 border-radius: 6px;
 cursor: pointer;
-font-size: 13px;
+font-size: 14px;
 transition: background 0.2s;
 width: 100%;
+font-weight: 500;
 }
 
 td button:hover {
@@ -181,25 +219,28 @@ background: var(--brand-dark);
 background: var(--success) !important; 
 }
 
-/* Стили для селектов оплаты/отправки */
+/* Стиль для селектов оплаты/отправки */
 select.cell-payment, select.cell-sent {
-min-width: 90px;
+min-width: 100px;
+font-size: 14px;
 }
 
 /* Стиль для фильтров */
 #searchInput {
-min-width: 200px;
+min-width: 220px;
 flex-grow: 1;
+font-size: 15px;
 }
 
 .toolbar button {
-padding: 8px 16px;
+padding: 10px 20px;
 background: var(--brand);
 color: white;
 border: none;
 border-radius: 8px;
 cursor: pointer;
 font-weight: 600;
+font-size: 15px;
 transition: background 0.2s;
 }
 
@@ -209,17 +250,50 @@ background: var(--brand-dark);
 
 /* Улучшение скролла */
 .table-wrapper::-webkit-scrollbar {
-height: 8px;
+height: 10px;
 }
 
 .table-wrapper::-webkit-scrollbar-track {
 background: #ffe3f2;
-border-radius: 4px;
+border-radius: 5px;
 }
 
 .table-wrapper::-webkit-scrollbar-thumb {
 background: var(--brand);
-border-radius: 4px;
+border-radius: 5px;
+}
+
+/* Статус бар */
+.status-bar {
+position: fixed;
+bottom: 0;
+left: 0;
+right: 0;
+background: #f5f5f5;
+padding: 8px 20px;
+font-size: 13px;
+color: #666;
+border-top: 1px solid #ddd;
+display: flex;
+justify-content: space-between;
+z-index: 100;
+}
+
+.status-item {
+display: flex;
+align-items: center;
+gap: 5px;
+}
+
+.status-dot {
+width: 8px;
+height: 8px;
+border-radius: 50%;
+background: #4CAF50;
+}
+
+.status-dot.offline {
+background: #ff9800;
 }
 </style>
 </head>
@@ -227,6 +301,7 @@ border-radius: 4px;
 <body>
 
 <div class="header">Mylitta — Учёт заказов</div>
+<div class="save-notification" id="saveNotification">Сохранено ✓</div>
 
 <div class="container">
 
@@ -268,6 +343,16 @@ border-radius: 4px;
 
 </div>
 
+<div class="status-bar">
+<div class="status-item">
+<span class="status-dot" id="statusDot"></span>
+<span id="statusText">Готов</span>
+</div>
+<div class="status-item">
+<span id="unsavedCount">Все изменения сохранены</span>
+</div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
@@ -286,13 +371,8 @@ const db = getDatabase(app);
 
 let counter = 1;
 let isUpdatingFromFirebase = false;
-
-/* ДЕБАУНС — чтобы ввод и удаление не лагали */
-let saveTimeout = null;
-function saveDataDebounced() {
-clearTimeout(saveTimeout);
-saveTimeout = setTimeout(saveDataToFirebase, 250);
-}
+let unsavedChanges = new Set(); // Отслеживаем несохраненные поля
+let isSaving = false; // Флаг процесса сохранения
 
 /* Глобальные функции */
 window.addRow = addRow;
@@ -301,10 +381,46 @@ window.resetPurchases = resetPurchases;
 window.resetFullRow = resetFullRow;
 window.updateRowAppearance = updateRowAppearance;
 
-/* Сохранение */
-function saveDataToFirebase() {
-if (isUpdatingFromFirebase) return;
+/* Уведомление о сохранении */
+function showSaveNotification(message = "Сохранено ✓", isSavingMsg = false) {
+const notification = document.getElementById('saveNotification');
+notification.textContent = message;
+notification.classList.toggle('saving', isSavingMsg);
+notification.classList.add('show');
+setTimeout(() => {
+notification.classList.remove('show');
+}, isSavingMsg ? 1000 : 2000);
+}
 
+/* Обновление статус-бара */
+function updateStatusBar() {
+const statusText = document.getElementById('statusText');
+const unsavedCountElem = document.getElementById('unsavedCount');
+const statusDot = document.getElementById('statusDot');
+  
+if (isSaving) {
+statusText.textContent = "Сохранение...";
+statusDot.style.background = "#2196F3";
+} else if (unsavedChanges.size > 0) {
+statusText.textContent = "Есть несохраненные изменения";
+statusDot.style.background = "#ff9800";
+unsavedCountElem.textContent = `Не сохранено: ${unsavedChanges.size} полей`;
+} else {
+statusText.textContent = "Все изменения сохранены";
+statusDot.style.background = "#4CAF50";
+unsavedCountElem.textContent = "Все изменения сохранены";
+}
+}
+
+/* Сохранение данных в Firebase */
+async function saveDataToFirebase() {
+if (isUpdatingFromFirebase || isSaving) return;
+  
+isSaving = true;
+updateStatusBar();
+showSaveNotification("Сохранение...", true);
+
+try {
 const rows = [];
 document.querySelectorAll("#tableBody tr").forEach(row => {
 const cells = row.querySelectorAll("input, textarea, select");
@@ -313,18 +429,65 @@ cells.forEach(c => rowData.push(c.value));
 rows.push(rowData);
 });
 
-set(ref(db, "orders"), rows);
+await set(ref(db, "orders"), rows);
+  
+// Убираем пометки о несохраненных изменениях
+unsavedChanges.clear();
+document.querySelectorAll('.changed').forEach(el => {
+el.classList.remove('changed');
+});
+  
+showSaveNotification("Сохранено ✓");
+} catch (error) {
+console.error("Ошибка сохранения:", error);
+showSaveNotification("Ошибка сохранения!", true);
+// Сохраняем в localStorage как резервную копию
+localStorage.setItem('mylitta_backup', JSON.stringify(rows));
+localStorage.setItem('mylitta_backup_time', new Date().toISOString());
+} finally {
+isSaving = false;
+updateStatusBar();
+}
 }
 
-/* Загрузка */
+/* Отметить поле как измененное */
+function markAsChanged(field) {
+const fieldId = `${field.dataset.row}-${field.className || field.tagName}`;
+unsavedChanges.add(fieldId);
+field.classList.add('changed');
+updateStatusBar();
+  
+// Автосохранение через 5 секунд на всякий случай
+clearTimeout(window.autoSaveTimer);
+window.autoSaveTimer = setTimeout(() => {
+if (unsavedChanges.size > 0) {
+saveDataToFirebase();
+}
+}, 5000);
+}
+
+/* Загрузка данных */
 function loadDataFromFirebase(rows) {
 isUpdatingFromFirebase = true;
-
 const table = document.getElementById("tableBody");
 table.innerHTML = "";
 counter = 1;
 
+if (rows && rows.length > 0) {
 rows.forEach(r => addRow(r));
+} else {
+const backup = localStorage.getItem('mylitta_backup');
+if (backup) {
+try {
+const backupData = JSON.parse(backup);
+backupData.forEach(values => addRow(values));
+} catch (e) {
+addRow();
+}
+} else {
+addRow();
+}
+}
 
 isUpdatingFromFirebase = false;
 }
@@ -333,24 +496,25 @@ isUpdatingFromFirebase = false;
 function addRow(savedData = null) {
 const table = document.getElementById("tableBody");
 const row = document.createElement("tr");
+const rowId = Date.now() + Math.random();
 
 row.innerHTML = `
 <td>${counter}</td>
-<td><input class="cell-name" placeholder="Имя клиента"></td>
-<td><input placeholder="+375..."></td>
-<td><input placeholder="Адрес"></td>
-<td><textarea class="cell-items" placeholder="Товар 1 100\nТовар 2 50"></textarea></td>
-<td><input class="cell-sum" readonly value="0"></td>
+<td><input class="cell-name" placeholder="Имя клиента" data-row="${rowId}"></td>
+<td><input class="cell-phone" placeholder="+375..." data-row="${rowId}"></td>
+<td><input class="cell-address" placeholder="Адрес" data-row="${rowId}"></td>
+<td><textarea class="cell-items" placeholder="Товар 1 100\nТовар 2 50" data-row="${rowId}"></textarea></td>
+<td><input class="cell-sum" readonly value="0" data-row="${rowId}"></td>
 
 <td>
-<select class="cell-payment" onchange="updateRowAppearance(this); saveDataDebounced(); applyFilters();">
+<select class="cell-payment" data-row="${rowId}">
 <option value="no">Не оплачено</option>
 <option value="yes">Оплачено</option>
 </select>
 </td>
 
 <td>
-<select onchange="saveDataDebounced()">
+<select class="cell-service" data-row="${rowId}">
 <option>Белпочта</option>
 <option>ЕвроПочта</option>
 <option>Самовывоз</option>
@@ -358,29 +522,30 @@ row.innerHTML = `
 </td>
 
 <td>
-<select class="cell-sent" onchange="saveDataDebounced(); applyFilters()">
+<select class="cell-sent" data-row="${rowId}">
 <option value="no">Не отправлено</option>
 <option value="yes">Отправлено</option>
 </select>
 </td>
 
-<td><button onclick="resetPurchases(this)">Сбросить</button></td>
+<td><button onclick="resetPurchases(this)">Сбросить товары</button></td>
 <td><button onclick="resetFullRow(this)">Полный сброс</button></td>
 `;
 
 table.appendChild(row);
 
+/* ФИКС: Обработчик для поля "Товары" */
 const items = row.querySelector(".cell-items");
 const sum = row.querySelector(".cell-sum");
 
-// ФИКС: Улучшенный расчет суммы
-items.addEventListener("input", () => {
+// Функция расчета суммы
+function calculateSum() {
 let total = 0;
 const lines = items.value.split("\n");
 lines.forEach(line => {
 const trimmed = line.trim();
 if (trimmed) {
-const parts = trimmed.split(" ");
+const parts = trimmed.split(/\s+/);
 const last = parseFloat(parts[parts.length - 1]);
 if (!isNaN(last)) {
 total += last;
@@ -388,33 +553,70 @@ total += last;
 }
 });
 sum.value = total.toFixed(2);
-saveDataDebounced();
-});
-
-// ФИКС: Автофокус при добавлении новой строки
-if (!savedData) {
-setTimeout(() => {
-row.querySelector(".cell-name").focus();
-}, 10);
 }
 
-// Обработчики для всех полей ввода
-row.querySelectorAll("input, textarea, select").forEach(el => {
-el.addEventListener("input", saveDataDebounced);
-el.addEventListener("change", saveDataDebounced);
+// Расчет суммы при изменении
+items.addEventListener('input', calculateSum);
+
+// Сохранение при выходе из поля
+items.addEventListener('blur', function() {
+markAsChanged(this);
+saveDataToFirebase();
 });
+
+/* Обработчики для всех полей ввода */
+row.querySelectorAll("input, textarea, select").forEach(el => {
+// Пропускаем поле "Сумма" (оно readonly)
+if (el.classList.contains('cell-sum')) return;
+
+// Для селектов - сохранение при изменении
+if (el.tagName === 'SELECT') {
+el.addEventListener('change', function() {
+if (this.classList.contains('cell-payment')) {
+updateRowAppearance(this);
+}
+markAsChanged(this);
+saveDataToFirebase();
+});
+}
+
+// Для текстовых полей - сохранение при выходе
+if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+el.addEventListener('blur', function() {
+markAsChanged(this);
+saveDataToFirebase();
+});
+}
+});
+
+// Автофокус при добавлении новой строки
+if (!savedData) {
+setTimeout(() => {
+const nameInput = row.querySelector(".cell-name");
+if (nameInput) {
+nameInput.focus();
+nameInput.select();
+}
+}, 50);
+}
 
 // Заполнение сохраненными данными
 if (savedData) {
 const inputs = row.querySelectorAll("input, textarea, select");
 savedData.forEach((v, i) => {
-if (inputs[i]) inputs[i].value = v;
+if (inputs[i]) {
+inputs[i].value = v;
+if (inputs[i].classList.contains('cell-payment')) {
+updateRowAppearance(inputs[i]);
+}
+if (inputs[i].classList.contains('cell-items')) {
+calculateSum();
+}
+}
 });
-updateRowAppearance(row.querySelector(".cell-payment"));
 }
 
 counter++;
-saveDataDebounced();
 }
 
 function updateRowAppearance(select) {
@@ -428,24 +630,35 @@ row.classList.remove("paid-row");
 
 function resetPurchases(btn) {
 const row = btn.closest("tr");
-row.querySelector(".cell-items").value = "";
-row.querySelector(".cell-sum").value = "0";
-saveDataDebounced();
+const items = row.querySelector(".cell-items");
+const sum = row.querySelector(".cell-sum");
+items.value = "";
+sum.value = "0";
+markAsChanged(items);
+saveDataToFirebase();
 }
 
 function resetFullRow(btn) {
 const row = btn.closest("tr");
-row.querySelectorAll("input, textarea").forEach(el => {
+row.querySelectorAll("input, textarea, select").forEach(el => {
 if (el.classList.contains("cell-sum")) {
 el.value = "0";
-} else {
+} else if (el.classList.contains("cell-payment")) {
+el.value = "no";
+updateRowAppearance(el);
+} else if (el.classList.contains("cell-sent")) {
+el.value = "no";
+} else if (el.tagName === 'SELECT') {
+el.value = el.querySelector('option').value;
+} else if (el.tagName !== 'BUTTON') {
 el.value = "";
 }
+if (!el.classList.contains('cell-sum')) {
+markAsChanged(el);
+}
 });
-row.querySelector(".cell-payment").value = "no";
-row.querySelector(".cell-sent").value = "no";
 row.classList.remove("paid-row");
-saveDataDebounced();
+saveDataToFirebase();
 applyFilters();
 }
 
@@ -456,16 +669,9 @@ const sent = document.getElementById("filterSent").value;
 
 document.querySelectorAll("#tableBody tr").forEach(row => {
 let visible = true;
-
-const nameInput = row.querySelector(".cell-name");
-const paymentSelect = row.querySelector(".cell-payment");
-const sentSelect = row.querySelector(".cell-sent");
-
-if (!nameInput || !paymentSelect || !sentSelect) return;
-
-const name = nameInput.value.toLowerCase();
-const payment = paymentSelect.value;
-const sentVal = sentSelect.value;
+const name = row.querySelector(".cell-name")?.value.toLowerCase() || "";
+const payment = row.querySelector(".cell-payment")?.value || "no";
+const sentVal = row.querySelector(".cell-sent")?.value || "no";
 
 if (search && !name.includes(search)) visible = false;
 if (pay === "paid" && payment !== "yes") visible = false;
@@ -477,20 +683,59 @@ row.style.display = visible ? "" : "none";
 });
 }
 
-/* Автообновление */
-onValue(ref(db, "orders"), snap => {
-const rows = snap.val();
-if (rows) loadDataFromFirebase(rows);
-});
-
-// Инициализация первой строки при загрузке
+/* Инициализация при загрузке */
 document.addEventListener('DOMContentLoaded', () => {
+// Обновление статуса сети
+function updateOnlineStatus() {
+const statusDot = document.getElementById('statusDot');
+if (navigator.onLine) {
+statusDot.style.background = "#4CAF50";
+} else {
+statusDot.style.background = "#ff9800";
+setTimeout(() => {
+if (unsavedChanges.size > 0) {
+showSaveNotification("Нет соединения. Изменения сохранены локально.", true);
+}
+}, 1000);
+}
+}
+
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+updateOnlineStatus();
+
+// Загружаем начальные данные
 setTimeout(() => {
 if (document.querySelectorAll("#tableBody tr").length === 0) {
 addRow();
 }
-}, 100);
+}, 200);
 });
+
+/* Автообновление из Firebase */
+onValue(ref(db, "orders"), snap => {
+const rows = snap.val();
+if (rows && !isSaving && unsavedChanges.size === 0) {
+loadDataFromFirebase(rows);
+}
+});
+
+/* Сохранение при закрытии страницы */
+window.addEventListener('beforeunload', function(e) {
+if (unsavedChanges.size > 0) {
+e.preventDefault();
+e.returnValue = 'У вас есть несохраненные изменения. Вы уверены, что хотите уйти?';
+saveDataToFirebase();
+}
+});
+
+/* Периодическое сохранение (только если есть изменения) */
+setInterval(() => {
+if (unsavedChanges.size > 0 && !isSaving) {
+saveDataToFirebase();
+}
+}, 30000);
+
 </script>
 
 </body>
